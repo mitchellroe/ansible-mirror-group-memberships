@@ -1,0 +1,29 @@
+---
+# file: playbook-emulate-group-membership.yml
+
+- hosts: all
+  become: yes
+  vars:
+    user_to_mirror: good_user
+    users_to_modify:
+      - bad_user_1
+      - bad_user_2
+  tasks:
+
+    - name: "get the list of local groups for {{ user_to_emulate }}"
+      shell:
+        cmd: grep {{ user_to_emulate }} /etc/group | cut -f 1 -d ":" | tr '\n' ',' | sed -e 's/,$//'
+      register: my_groups_raw
+    - debug: var=my_groups_raw
+
+    - name: filter out the excess
+      set_fact:
+        my_groups: "{{ my_groups_raw.stdout }}"
+    - debug: var=my_groups
+
+    - name: add user(s) to the groups
+      user:
+        name: "{{ item }}"
+        append: yes
+        groups: "{{ my_groups }}"
+      loop: "{{ users_to_add }}"
