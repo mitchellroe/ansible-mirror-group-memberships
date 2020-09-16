@@ -4,10 +4,10 @@
 - hosts: all
   become: yes
   vars:
-    user_to_mirror: good_user
+    user_to_mirror: user1
     users_to_modify:
-      - bad_user_1
-      - bad_user_2
+      - user2
+      - user3
   tasks:
 
     - name: "get the list of local groups for {{ user_to_emulate }}"
